@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { 
+        font: 13px Helvetica, Arial;
+      }
+      form { 
+        background: #000; 
+        padding: 3px; 
+        position: fixed; 
+        bottom: 0; 
+        width: 100%; 
+      }
+      form input { 
+        border: 0; 
+        padding: 10px; 
+        width: 90%; 
+        margin-right: .5%; 
+      }
+      form button { 
+        width: 9%; 
+        background: rgb(130, 224, 255); 
+        border: none; 
+        padding: 10px; 
+      }
+      #messages { 
+        list-style-type: none; 
+        margin: 0; 
+        padding: 0; 
+      }
+      #messages li { 
+        padding: 5px 10px;
+      }
+      #messages li:nth-child(odd) { 
+        background: #eee; 
+      }
+      #messages { 
+        margin-bottom: 40px 
+      }
+    </style>
+  </head>
+  <body>
+    <button id="ping">PING</button>
+    <button id="join-room">join</button>
+    <button id="to-perundingan">to perundingan</button>
+    <button id="online">to perundingan</button>
+    <button id="show-online">show online</button>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        let urlParam = new URLSearchParams(window.location.search);
+        let username = urlParam.get('u');
+        let namespace = document.cookie.split('=')[1];
+        var socket = io(`http://localhost:8080/${namespace}`,{
+          query: {
+            'username': username
+          }
+        });
+        $('#show-online').click(() => {
+          socket.emit('show-online');
+        })
+        $('#ping').click(() => {
+          console.log("clicked");
+          socket.emit('pingu');
+        });
+        $('#join-room').click(() => {
+          socket.emit('join:perundingan');
+        });
+        $('#to-perundingan').click(() => {
+          socket.emit('broadcast:perundingan','hallo perundingan');
+        });
+        $('#online').click(() => {
+          socket.emit('show online');
+        });
+        socket.on('perundingan:rec',(msg)=>{
+          $('#messages').append($('<li>').text("perundingang : " + msg));
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+        $('form').submit(function(){
+          socket.emit('chat message', $('#m').val(), socket.id);
+          socket.send('perdudungan');
+          $('#m').val('');
+          return false;
+        });
+        socket.on('show-online',(msg) => {
+          $('#messages').append($('<li>').text(msg));
+          window.scrollTo(0, document.body.scrollHeight);
+        })
+        socket.on('pingu', (msg) => {
+          $('#messages').append($('<li>').text(msg));
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+        socket.on('chat message', (msg,senderId) => {
+          $('#messages').append($('<li>').text(senderId + " - " +msg));
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+        socket.on('system status', (msg) => {
+          $('#messages').append($('<li>').html('<i>' + msg + '</i>'));
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+        socket.on('show online', (data) => {
+          alert(data);
+        });
+      });
+    </script>
+  </body>
+</html>
