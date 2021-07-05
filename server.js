@@ -29,14 +29,15 @@ io.of(/^\/[\w-]+$/).on('connection', socket => {
         sender: username
       }
     })
-    .then(response => {
-      socket.to(room).emit('private-chat', data.message, username);
-    })
-    .catch(error => {
-      console.log(error);
-    });
-
-    
+      .then(response => {
+        socket.to(room).emit('private-chat', data.message, username);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  });
+  socket.on('im-online', data => {
+    socket.broadcast.emit('who-online', username);
   })
 });
 
