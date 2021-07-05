@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "chat-server": "node server.js"
+    "chat-server": "node server.js",
+    "nodemon-start": "nodemon  server.js -e js,hbs"
   }
 }
