@@ -36,8 +36,14 @@ io.of(/^\/[\w-]+$/).on('connection', socket => {
         console.log(error);
       });
   });
-  socket.on('im-online', data => {
-    socket.broadcast.emit('who-online', username);
+  socket.on('im-online', ({ sender, init }) => {
+    if (init) {
+      init = init - 1
+      socket.broadcast.emit('who-online', { username, init });
+    }
+  })
+  socket.on('disconnect', (data) => {
+    socket.broadcast.emit('leaving', username)
   })
 });
 
